@@ -1,1 +1,27 @@
-NMEA 0183（多分）のGPSのデータを加工するクラス
+NMEA 0183（多分）のGPSのデータを扱うライブラリ
+
+メソッド
+ Gps() コンストラクタ
+ Start() シリアルの受信開始
+ Stop() シリアルの受信停止
+ GetPortList() シリアルポート一覧の取得
+プロパティ
+ Port:String COMポート（COM4)
+ BaudRate:int ボーレート (4800)
+ DataBits:int データビット (8)
+ Parity:System.IO.Ports.SerialPort.Parity (None)
+ StopBits:System.IO.Ports.SerialPort.StopBits (One)
+ Handshake:System.IO.Ports.SerialPort.Handshake (None)
+
+new→プロパティのセット→Start→(データ受信)→GpsDataReceiveが呼ばれる
+
+GpsDataReceiveにイベントハンドラーをセットすると、
+データを受信するごとイベントを発生させる。
+GpsReadEventArgsは発生したイベントのデータを保持してる。
+ Time:String
+ Latitude:String
+ Longitude:String
+ Quality:String
+ Satellites:String
+ GeoidHeight:String
+適当に焼いて煮るよろし。
