@@ -11,18 +11,30 @@ namespace test2
 {
     public partial class Form1 : Form
     {
+        Nanariya.Gps _gps = null;
+
         public Form1()
         {
             InitializeComponent();
+
+            _gps = new Nanariya.Gps();
+            _gps.GpsDataReceive += new Nanariya.Gps.GpsEventHandler(gps_GpsDataReceive);
+
+            String[] ports = _gps.GetPortList();
+            
+            foreach (String port in ports)
+            {
+                comboBox1.Items.Add(port);
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Nanariya.Gps gps = new Nanariya.Gps();
-            gps.GpsDataReceive += new Nanariya.Gps.GpsEventHandler(gps_GpsDataReceive);
-
-            gps.Start();
-            
+            if(comboBox1.SelectedItem != null)
+            {
+                _gps.Port = comboBox1.SelectedItem.ToString(); 
+            }
+            _gps.Start();
         }
 
         delegate void GpsReadDelegate(Nanariya.GpsReadEventArgs data);
@@ -39,7 +51,12 @@ namespace test2
 
         private void GpsRead(Nanariya.GpsReadEventArgs data)
         {
-            richTextBox1.AppendText("N " + data.Latitude + ", E " + data.Longitude + "\r\n");
+            richTextBox1.AppendText("Time " + data.Time + " N " + data.Latitude + ", E " + data.Longitude + "\r\n");
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            _gps.Stop();
         }
 
     }

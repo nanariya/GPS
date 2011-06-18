@@ -57,6 +57,22 @@ namespace Nanariya
             _serialPort.Open();
         }
 
+        public void Stop()
+        {
+            _serialPort.Close();
+            _serialPort.Dispose();
+        }
+
+        public String[] GetPortList()
+        {
+            String[] ports = SerialPort.GetPortNames();
+            if (ports == null)
+            {
+                new Exception("Serialポートがないよエラー");
+            }
+            return ports;
+        }
+
         /// <summary>
         /// SerialPortのイベント受け取り
         /// </summary>
@@ -64,16 +80,22 @@ namespace Nanariya
         /// <param name="e"></param>
         void _serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            Dictionary<String, String> eventData = new Dictionary<string, string>();
-
-            //生データを加工
-            eventData = ParseGpsPos(_serialPort.ReadLine());
-
-            //中身あるときだけイベント発生させる（仮
-            if (eventData.Count > 0)
+            try
             {
-                GpsReadEventArgs gpsEvent = new GpsReadEventArgs(eventData);
-                OnGpsDataReceive(gpsEvent);
+                Dictionary<String, String> eventData = new Dictionary<string, string>();
+
+                //生データを加工
+                eventData = ParseGpsPos(_serialPort.ReadLine());
+
+                //中身あるときだけイベント発生させる（仮
+                if (eventData.Count > 0)
+                {
+                    GpsReadEventArgs gpsEvent = new GpsReadEventArgs(eventData);
+                    OnGpsDataReceive(gpsEvent);
+                }
+            }
+            catch(Exception)
+            {
             }
         }
 
