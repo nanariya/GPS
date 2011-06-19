@@ -19,9 +19,11 @@ GpsDataReceiveにイベントハンドラーをセットすると、
 データを受信するごとイベントを発生させる。
 GpsReadEventArgsは発生したイベントのデータを保持してる。
  Time:String
+ NS:String (北緯か南緯)
  Latitude:String
+ EW:String (東経か西経)
  Longitude:String
- Quality:String
- Satellites:String
+ Quality:String (0だと未測位 1だと測位 他は知らない)
+ Satellites:String (補足してる衛星の数)
  GeoidHeight:String
 適当に焼いて煮るよろし。

@@ -111,7 +111,7 @@ namespace Nanariya
             string[] rawLines = rawData.Split('\n');
             foreach (string line in rawLines)
             {
-                Regex regex = new Regex("^\\$GPGGA,\\d+,\\d+.\\d+,N,\\d+.\\d+,E,1");
+                Regex regex = new Regex("^\\$GPGGA,\\d+,\\d+.\\d+,\\w,\\d+.\\d+,\\w,1");
                 if (regex.IsMatch(line))
                 {
                     //0:$GPGGA
@@ -127,13 +127,21 @@ namespace Nanariya
                     //10:M
                     //11:ジオイド高
                     string[] cols = line.Split(',');
+                    temp.Add("Enable", "true");
                     temp.Add("Time", cols[1]);
                     temp.Add("Latitude", Convert60to10(cols[2]));
+                    temp.Add("NS", cols[3]);
                     temp.Add("Longitude", Convert60to10(cols[4]));
+                    temp.Add("EW", cols[5]);
                     temp.Add("Quality", cols[6]);
                     temp.Add("Satellites", cols[7]);
                     temp.Add("GeoidHeight", cols[11]);
 
+                }
+                Regex gpsDisable = new Regex("^\\$GPGGA,\\d+,\\d+.\\d+,\\w,\\d+.\\d+,\\w,0");
+                if (gpsDisable.IsMatch(line))
+                {
+                    temp.Add("Enable", "false");
                 }
             }
 
@@ -187,8 +195,11 @@ namespace Nanariya
             }
         }
 
+        public bool Enable { get { return System.Convert.ToBoolean(_args["Enable"]); } }
         public String Time { get { return _args["Time"]; } }
+        public String NS { get { return _args["NS"]; } }
         public String Latitude { get { return _args["Latitude"]; } }
+        public String EW { get { return _args["EW"]; } }
         public String Longitude { get { return _args["Longitude"]; } }
         public String Quality { get { return _args["Quality"]; } }
         public String Satellites { get { return _args["Satellites"]; } }
