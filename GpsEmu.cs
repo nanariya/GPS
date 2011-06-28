@@ -22,8 +22,7 @@ namespace Nanariya
         }
         #endregion
 
-        //SerialPort _serialPort = null;
-        System.Windows.Forms.Timer _timer = null;
+        private System.Windows.Forms.Timer _timer = null;
 
         public String Port { get; set; }
         public int BaudRate { get; set; }
@@ -32,7 +31,10 @@ namespace Nanariya
         public StopBits StopBits { get; set; }
         public Handshake Handshake { get; set; }
 
-                /// <summary>
+        private Double Ido { get; set; }
+        private Double Keido { get; set; }
+
+        /// <summary>
         /// コンストラクタ
         /// </summary>
         public GpsEmu()
@@ -49,16 +51,34 @@ namespace Nanariya
         public void Start()
         {
             _timer = new System.Windows.Forms.Timer();
-            _timer.Interval = 1000;
+            _timer.Interval = 3000;
             _timer.Tick += new EventHandler(_serialPort_DataReceived);
+
+            /*
+            Random rnd = new Random();
+
+            int r_ido = rnd.Next(250797); //経度 日本の幅
+            int r_keido = rnd.Next(310310); //緯度　日本の高さ
+
+            r_ido += 202531;    //日本の最南端
+            r_keido += 1225601; //日本の最西端
+
+            double ido = double.Parse(r_ido.ToString()) / 10000;
+            double keido = double.Parse(r_keido.ToString()) / 10000;
+
+            this.Ido = ido;
+            this.Keido = keido;
+            */
+
+            this.Ido = 35.7004;
+            this.Keido = 139.771;
+
             _timer.Start();
         }
         public void Stop()
         {
             _timer.Stop();
             _timer.Dispose();
-            //_serialPort.Close();
-            //_serialPort.Dispose();
         }
 
         public String[] GetPortList()
@@ -71,7 +91,7 @@ namespace Nanariya
             return ports;
         }
         /// <summary>
-        /// SerialPortのイベント受け取り
+        /// SerialPortのイベント受け取りに見せかけたTimerのTick
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -80,22 +100,20 @@ namespace Nanariya
             try
             {
                 Random rnd = new Random();
+                int deg = rnd.Next(359);
+                double radian = deg * 3.141592 / 180.0;
+                double sin = Math.Sin(radian);
+                double cos = Math.Cos(radian);
 
-                int r_ido = rnd.Next(250797); //経度
-                int r_keido = rnd.Next(310310); //緯度
-
-                r_ido += 202531;
-                r_keido += 1225601;
-
-                double ido = double.Parse(r_ido.ToString()) / 10000;
-                double keido = double.Parse(r_keido.ToString()) / 10000;
-
+                this.Ido += (sin / 1000);
+                this.Keido += (cos / 1000);
+                
                 Dictionary<String, String> eventData = new Dictionary<string, string>();
                 eventData.Add("Enable", "true");
                 eventData.Add("Time", "0");
-                eventData.Add("Latitude", ido.ToString());
+                eventData.Add("Latitude", this.Ido.ToString());
                 eventData.Add("NS", "N");
-                eventData.Add("Longitude", keido.ToString());
+                eventData.Add("Longitude", this.Keido.ToString());
                 eventData.Add("EW", "E");
                 eventData.Add("Quality", "test");
                 eventData.Add("Satellites", "test");
